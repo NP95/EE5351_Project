@@ -1,0 +1,39 @@
+Flow of the AES CPU program
+
+1. Main function does 
+a. Takes in the input file name 
+b. Pads the data accordingly
+c. Generates the Key
+d. Call the AES encrypt function
+e. Writes ciphertext to the file
+f. Decrypts the cipheretext
+
+What does AES encrypt demo do?
+Initializes the key -> Creates the Round keys?
+Also copies the key into two separate encryption and decryption keys
+Calls the encrypt function in a serial manner? (Place for parallelization)?
+
+How does the AES_expandEncKey function work? 
+
+To understand the arguments see how the function is called
+
+Is it hardcoded for 256 or can it be configured for 128 and 192? Hardcoded for 256
+
+
+
+
+
+What does the aes256_encrypt function do?
+void *memcpy(void *dest, const void * src, size_t n)
+
+Calls the Roundkey_cpy function
+
+Performs the AES rounds
+
+Starting from 1 to Nr-1
+(Nr-1) iterations
+
+Then some funky mumbo jumbo
+
+
+
