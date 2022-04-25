@@ -1,3 +1,7 @@
+
+// Original author Canhui Wang
+// Taken from the repository https://github.com/Canhui/AES-ON-GPU
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
