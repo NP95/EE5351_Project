@@ -1,3 +1,116 @@
+https://www.ime.usp.br/~rt/cranalysis/AESSimplified.pdf
+https://events.prace-ri.eu/event/989/sessions/3077/attachments/1195/2032/cuda-efficiency.pdf
+https://blog.tclaverie.eu/posts/understanding-golangs-aes-implementation-t-tables/
+https://stackoverflow.com/questions/9731242/efficiently-transfer-large-file-up-to-2gb-to-cuda-gpu
+
+
+Validation - 1. Phase 0
+             2. Phase 1 with dataset 
+             3. Phase 2 With automated datasets
+
+
+CPU-128 Throughput with varying file sizes vs GPU-128 Throughput varying file sizes
+
+Use __byte_perm() somehow?
+
+What the fuck are T tables?
+
+
+KeyExpansionCore(byte1, byte2, byte3, byte4, round) {
+RotateLeft(byte1, byte2, byte3, byte4);
+byte1 = SubBytes(byte1);
+byte2 = SubBytes(byte2);
+byte3 = SubBytes(byte3);
+byte4 = SubBytes(byte4);
+AddRoundConstant(byte1, byte2, byte3, byte4, round);
+return (byte1, byte2, byte3, byte4);
+}
+
+
+
+
+
+128 bit key 
+
+KeyExpansion128(InitialKey) {
+ExpansionKey = InitialKey;
+while (len(ExpansionKey) < 176) {
+for (j = 0; j<4; j++) {
+temp1 = last_four_bytes_of_ExpansionKey;
+if (j==0) {temp1 = KeyExpansionCore(temp1,round);}
+temp2 = last_16_bytes_of_ExpansionKey;
+temp2 = first_four_bytes_of_temp2;
+append_to_ExpansionKey(temp1 XOR temp2);
+}
+round++;
+}
+return ExpansionKey;
+}
+
+
+192 bit key
+
+
+KeyExpansion192(InitialKey) {
+ExpansionKey = InitialKey;
+while (len(ExpansionKey) < 208) {
+for (j = 0; j<6; j++) {
+temp1 = last_four_bytes_of_ExpansionKey;
+if (j==0) {temp1 = KeyExpansionCore(temp1,round);}
+temp2 = last_24_bytes_of_ExpansionKey;
+temp2 = first_four_bytes_of_temp2;
+append_to_ExpansionKey(temp1 XOR temp2);
+}
+round++;
+}
+return ExpansionKey;
+}
+
+
+KeyExpansion256(InitialKey) {
+ExpansionKey = InitialKey;
+while (len(ExpansionKey) < 240) {
+for (j = 0; j<8; j++) {
+temp1 = last_four_bytes_of_ExpansionKey;
+if (j==0) {temp1 = KeyExpansionCore(temp1,round);}
+if (j==4) {temp1 = SubBytes(temp1);}
+temp2 = last_32_bytes_of_ExpansionKey;
+temp2 = first_four_bytes_of_temp2;
+append_to_ExpansionKey(temp1 XOR temp2);
+}
+round++;
+}
+return ExpansionKey;
+}
+
+
+
+Graphs to be created
+
+File size range(each measurement 5 times) to eliminate noise 
+128M
+256M
+512M
+1G
+2G
+4G
+8G
+16G
+32G
+64G
+128G
+256G
+
+for Phase 2
+
+
+
+What are T tables?
+
+
+
+
+
 Flow of the AES CPU program
 
 1. Main function does 
