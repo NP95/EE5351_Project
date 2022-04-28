@@ -2,7 +2,7 @@ https://www.ime.usp.br/~rt/cranalysis/AESSimplified.pdf
 https://events.prace-ri.eu/event/989/sessions/3077/attachments/1195/2032/cuda-efficiency.pdf
 https://blog.tclaverie.eu/posts/understanding-golangs-aes-implementation-t-tables/
 https://stackoverflow.com/questions/9731242/efficiently-transfer-large-file-up-to-2gb-to-cuda-gpu
-
+http://www.moserware.com/2009/09/stick-figure-guide-to-advanced.html
 
 Validation - 1. Phase 0
              2. Phase 1 with dataset 
@@ -12,6 +12,9 @@ Validation - 1. Phase 0
 CPU-128 Throughput with varying file sizes vs GPU-128 Throughput varying file sizes
 
 Use __byte_perm() somehow?
+
+__device__ u32 arithmeticRightShiftBytePerm(u32 x, u32 n) { return __byte_perm(x, x, n); }
+
 
 What the fuck are T tables?
 
@@ -87,19 +90,19 @@ return ExpansionKey;
 
 Graphs to be created
 
-File size range(each measurement 5 times) to eliminate noise 
+File size range(each measurement 5 times) to eliminate noise
+64M 
 128M
 256M
 512M
 1G
 2G
+3G
 4G
+5G
+6G
+7G
 8G
-16G
-32G
-64G
-128G
-256G
 
 for Phase 2
 
@@ -114,12 +117,12 @@ What are T tables?
 Flow of the AES CPU program
 
 1. Main function does 
-a. Takes in the input file name 
-b. Pads the data accordingly
-c. Generates the Key
-d. Call the AES encrypt function
-e. Writes ciphertext to the file
-f. Decrypts the cipheretext
+	a. Takes in the input file name 
+	b. Pads the data accordingly
+	c. Generates the Key
+	d. Call the AES encrypt function
+	e. Writes ciphertext to the file
+	f. Decrypts the cipheretext
 
 What does AES encrypt demo do?
 Initializes the key -> Creates the Round keys?
