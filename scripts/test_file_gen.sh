@@ -1,0 +1,13 @@
+#tr -dc A-Za-z0-9 </dev/urandom | head -c 67108864>>file00	
+#tr -dc A-Za-z0-9 </dev/urandom | head -c 134217728>>file01	
+#tr -dc A-Za-z0-9 </dev/urandom | head -c 268435456>>file02	
+#tr -dc A-Za-z0-9 </dev/urandom | head -c 536870912>>file03	
+#tr -dc A-Za-z0-9 </dev/urandom | head -c 1073741824>>file04	
+#tr -dc A-Za-z0-9 </dev/urandom | head -c 2147483648>>file05	
+#tr -dc A-Za-z0-9 </dev/urandom | head -c 3221225472>>file06	
+#tr -dc A-Za-z0-9 </dev/urandom | head -c 4294967296>>file07	
+#tr -dc A-Za-z0-9 </dev/urandom | head -c 5368709120>>file08	
+#tr -dc A-Za-z0-9 </dev/urandom | head -c 6442450944>>file09	
+#tr -dc A-Za-z0-9 </dev/urandom | head -c 7,516,192,768>>file10	
+tr -dc A-Za-z0-9 </dev/urandom | head -c 8589934592>>file11	
+#tr -dc A-Za-z0-9 </dev/urandom | head -c 9,663,676,416>>file12	
