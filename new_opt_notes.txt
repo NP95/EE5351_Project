@@ -1,2 +1,13 @@
 1. This document does two things, first it captures the understanding of how T-tables work (https://blog.tclaverie.eu/posts/understanding-golangs-aes-implementation-t-tables/)
 2. Second this document summarizes the HP CUDA-AES (https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8252225)
+
+
+A. Separate the key size implemnetations and include the ability to read a file and encrypt and decrypt it.
+
+
+
+
+How to determine block and thread counts?
+
+Cihangir Tezcan and AbdelRahman papers?
+
