@@ -632,6 +632,7 @@ int main(void) {
 	double time;
 
 	// before test
+	/*
 	printf("AES Speed TEST\n");
 	printf("%08x %08x %08x %08x\n", P[0], P[1], P[2], P[3]);
 
@@ -648,6 +649,7 @@ int main(void) {
 		printf("%.3f Gbps\n", (double)(128 * 2 * iter) / (time * 1024 * 1024 * 1024));
 	}
 	printf("%08X %08X %08X %08X\n", P[0], P[1], P[2], P[3]);
+	*/
 	return 0;
 }
 

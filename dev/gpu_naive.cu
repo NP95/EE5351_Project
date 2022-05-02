@@ -653,7 +653,7 @@ int main(int argc, char** argv){
   // calculate the padding
   padding = numbytes % AES_BLOCK_SIZE;
   numbytes += padding;
-  printf("Padding file with %d bytes for a new size of %lu\n", padding, numbytes);
+  printf("Padding file with %d bytes for a new size of %llu\n", padding, numbytes);
 
   // generate key
   for (i = 0; i < sizeof(key);i++) key[i] = i;
@@ -668,7 +668,7 @@ int main(int argc, char** argv){
   encryptdemo(key, buf, numbytes);
   end = clock();
   fprintf(stats_file,"time used:%f\n",  (double)(end - start) / CLOCKS_PER_SEC);
-  fprintf(stats_file"GPU encryption throughput: %f bytes/second\n",  (double)(numbytes) / ((double)(end - start) / CLOCKS_PER_SEC));
+  fprintf(stats_file,"GPU encryption throughput: %f bytes/second\n",  (double)(numbytes) / ((double)(end - start) / CLOCKS_PER_SEC));
 
 
   // write into file
@@ -681,7 +681,7 @@ int main(int argc, char** argv){
   decryptdemo(key, buf, numbytes);
   end = clock();
   fprintf(stats_file,"time used:%f\n",  (double)(end - start) / CLOCKS_PER_SEC);
-  fprintf(stats_file,"GPU encryption throughput: %f bytes/second\n",  (double)(numbytes) / ((double)(end - start) / CLOCKS_PER_SEC));
+  fprintf(stats_file,"GPU decryption throughput: %f bytes/second\n",  (double)(numbytes) / ((double)(end - start) / CLOCKS_PER_SEC));
 
   fclose(stats_file);
   // write into file
