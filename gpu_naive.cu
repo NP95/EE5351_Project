@@ -1,5 +1,5 @@
-//Original Author: Canhui Wang
-// https://github.com/Canhui/AES-ON-GPU/blob/master/gpu_ver2.cu
+//Author: Nishant
+// Modified from the CPU version by Canhui Wong
 
 
 #include <stdlib.h>
@@ -10,6 +10,8 @@
 #include <inttypes.h>
 
 
+
+/*Declaring 3 copies of the same keys makes it easier to debug*/
 uint8_t ctx_key[32];
 uint8_t ctx_enckey[32];
 uint8_t ctx_deckey[32];
@@ -29,9 +31,10 @@ cudaError_t checkCuda(cudaError_t result)
 
 
 #define AES_BLOCK_SIZE 16
-#define THREADS_PER_BLOCK 512
+#define THREADS_PER_BLOCK 1024
 
 
+/*These are bit wise operations for the key expansion explained in the standard */
 #define F(x)   (((x)<<1) ^ ((((x)>>7) & 1) * 0x1b))
 #define FD(x)  (((x) >> 1) ^ (((x) & 1) ? 0x8d : 0))
 
@@ -238,7 +241,7 @@ __device__ void aes_mixColumns_inv(uint8_t *buf){
 }
 
 
-// add expand key operation
+// Add Expand Key, Takes a 256 bit key and generates a number of 128bit round keys
 __device__ __host__ void aes_expandEncKey(uint8_t *k, uint8_t *rc, const uint8_t *sb){
   register uint8_t i;
 
@@ -271,7 +274,7 @@ __device__ __host__ void aes_expandEncKey(uint8_t *k, uint8_t *rc, const uint8_t
 
 
 
-// inv add expand key operation
+// inv add expand key operation, For Decryption we use the same key as the encryption, however key schedule, i.e the order in which the keys are sent is different for the decryption
 __device__ void aes_expandDecKey(uint8_t *k, uint8_t *rc){
   uint8_t i;
 
@@ -301,16 +304,19 @@ __device__ void aes_expandDecKey(uint8_t *k, uint8_t *rc){
   k[3] ^= sbox[k[28]];
 }
 
-
-// key initition
+//Key initialization for usage by threads
 void aes256_init(uint8_t *k){
   uint8_t rcon = 1;
   register uint8_t i;
 
-  for (i = 0; i < sizeof(ctx_key); i++){
-    ctx_enckey[i] = ctx_deckey[i] = k[i];
+  for (i = 0; i < sizeof(ctx_key); i++)
+  {
+    ctx_enckey[i] = k[i];
+     ctx_deckey[i] = k[i];
   }
-  for (i = 8;--i;){
+
+  for (i = 8;--i;)
+  {
     aes_expandEncKey(ctx_deckey, &rcon, sbox);
   }
 }
@@ -401,8 +407,9 @@ void encryptdemo(uint8_t key[32], uint8_t *buf, unsigned long numbytes){
   aes256_init(key);
 
   checkCuda(cudaMalloc((void**)&buf_d, numbytes));
-  checkCuda(cudaMalloc((void**)&ctx_enckey_d, sizeof(ctx_enckey)));
-  checkCuda(cudaMalloc((void**)&ctx_key_d, sizeof(ctx_key)));
+ // checkCuda(cudaMallocHost((void**)&ctx_enckey_d, sizeof(ctx_enckey)));
+  checkCuda(cudaMallocHost((void**)&ctx_enckey_d, sizeof(ctx_enckey)));
+  checkCuda(cudaMallocHost((void**)&ctx_key_d, sizeof(ctx_key)));
 
 
 
@@ -481,8 +488,10 @@ aes256_encrypt_ecb<<<dimBlock, dimGrid>>>(buf_d, numbytes, ctx_enckey_d, ctx_key
 
 
  checkCuda(cudaFree(buf_d));
- checkCuda(cudaFree(ctx_key_d));
-  checkCuda(cudaFree(ctx_enckey_d));
+// checkCuda(cudaFree(ctx_key_d));
+// checkCuda(cudaFree(ctx_key_d));
+ checkCuda(cudaFreeHost(ctx_enckey_d));
+ checkCuda(cudaFreeHost(ctx_enckey_d));
 }
 
 
@@ -516,10 +525,11 @@ void decryptdemo(uint8_t key[32], uint8_t *buf, unsigned long numbytes){
   printf("\nBeginning decryption\n");
 
   checkCuda(cudaMalloc((void**)&buf_d, numbytes));
-  checkCuda(cudaMalloc((void**)&ctx_deckey_d, sizeof(ctx_deckey)));
-  checkCuda(cudaMalloc((void**)&ctx_key_d, sizeof(ctx_key)));
+ // checkCuda(cudaMalloc((void**)&ctx_deckey_d, sizeof(ctx_deckey)));
+ // checkCuda(cudaMalloc((void**)&ctx_key_d, sizeof(ctx_key)));
 
-
+  checkCuda(cudaMallocHost((void**)&ctx_deckey_d, sizeof(ctx_deckey)));
+  checkCuda(cudaMallocHost((void**)&ctx_key_d, sizeof(ctx_key)));
 
   // Recording host-to-device
   checkCuda(cudaEventCreate(&start)); // create event
@@ -599,14 +609,15 @@ aes256_decrypt_ecb<<<dimBlock, dimGrid>>>(buf_d, numbytes, ctx_deckey_d, ctx_key
 
 
  checkCuda(cudaFree(buf_d));
-  checkCuda(cudaFree(ctx_key_d));
-  checkCuda(cudaFree(ctx_deckey_d));
+//  checkCuda(cudaFree(ctx_key_d));
+//  checkCuda(cudaFree(ctx_key_d));
+  checkCuda(cudaFreeHost(ctx_deckey_d));
+  checkCuda(cudaFreeHost(ctx_deckey_d));
 }
 
 
 
 
-__global__ void GPU_init() { }
 
 
 
@@ -631,20 +642,6 @@ int main(int argc, char** argv){
   uint8_t key[32];
 
 
-  int deviceCount = 0;
-  cudaError_t error_id = cudaGetDeviceCount(&deviceCount);
-
-  if (error_id != cudaSuccess){
-    printf("Error: %s\n", cudaGetErrorString(error_id));
-    printf("Exiting...\n");
-    exit(EXIT_FAILURE);
-  }
-
-  if (deviceCount == 0){
-    printf("There are no available device(s) that support CUDA\n");
-    exit(EXIT_FAILURE);
-  }
-
   //File handling
   fname = argv[1];
   file = fopen(fname, "r");
@@ -668,10 +665,11 @@ int main(int argc, char** argv){
   printf("Padding file with %d bytes for a new size of %llu\n", padding, numbytes);
 
   // generate key
-  for (i = 0; i < sizeof(key);i++) key[i] = i;
+  for (i = 0; i < sizeof(key);i++)
+  {
+	  key[i] = i;
+  }
 
-  // this is to force nvcc to put the gpu initialization here
-  GPU_init<<<1, 1>>>();
 
   // encryption
   printf("Statistics collected in %s",strcat(stats,fname));

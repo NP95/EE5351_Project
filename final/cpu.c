@@ -1,10 +1,5 @@
-/* Author Nishant Pani
- This C code is modified from the Original CPU code written Canhui Wang,it extends from only choosing a 256 key size, to both 128 bit and 192 bit key sizes
- The modificatios and parallelizations are based on two papers
- 1.GPU Accelerated AES Algorithmi, Canhui Wang Xiaowen Chu
- 
-*/
 
+// Original author Canhui Wang
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -12,26 +7,16 @@
 #include <time.h>
 #include <inttypes.h>
 
-/*Modify the KEY and ROUND SIZE here
- Key Size  Round Size
- 128       10 
- 192       12
- 256       14
 
- Anything other than these three pairs are an invalid AES setting
- */
+uint8_t ctx_key[32]; 
+uint8_t ctx_enckey[32]; 
+uint8_t ctx_deckey[32];
+
+
 #define AES_BLOCK_SIZE 16
 #define THREADS_PER_BLOCK 256
-#define KEY_SIZE 256
-#define ROUND_SIZE 14
-
-uint8_t ctx_key[KEY_SIZE]; 
-uint8_t ctx_enckey[KEY_SIZE]; 
-uint8_t ctx_deckey[KEY_SIZE];
 
 
-/*  What are these?
-1. Some key expansion mumbo jumbo                   */
 #define F(x)   (((x)<<1) ^ ((((x)>>7) & 1) * 0x1b))
 #define FD(x)  (((x) >> 1) ^ (((x) & 1) ? 0x8d : 0))
 
@@ -117,7 +102,6 @@ uint8_t rj_xtime(uint8_t x){
 
 
 // subbyte operation
-/*Independent of key and round size*/
 void aes_subBytes(uint8_t *buf){
   register uint8_t i, b;
   for (i = 0; i < 16; ++i)
@@ -140,7 +124,6 @@ void aes_subBytes_inv(uint8_t *buf){
 
 // add round key operation
 void aes_addRoundKey(uint8_t *buf, uint8_t *key){
- //Why register?
   register uint8_t i = 16;
   while (i--){
     buf[i] ^= key[i];
@@ -159,8 +142,6 @@ void aes_addRoundKey_cpy(uint8_t *buf, uint8_t *key, uint8_t *cpk){
 
 
 // shift row operation
-//Shift rows is independent of the round and key size
-//Convince yourself that the functionality is correct
 void aes_shiftRows(uint8_t *buf){
   register uint8_t i, j;
   i = buf[1];
@@ -242,77 +223,9 @@ void aes_mixColumns_inv(uint8_t *buf){
 
 
 // add expand key operation
-/* This one might be key and round size dependent
-What are the arguments to this function?
-
-Critical path, you might have to modify this to make it generic
- 
- 
- */
-
-void aes_expandEncKey(uint8_t *k, uint8_t *rc, const uint8_t *sbi,uint8_t round_size){
+void aes_expandEncKey(uint8_t *k, uint8_t *rc, const uint8_t *sb){
   register uint8_t i;
 
-  // This is for 256 bits// 
-  if(round_size == 14)
-  {	  
-  k[0] ^= sb[k[29]] ^ (*rc);
-  k[1] ^= sb[k[30]];
-  k[2] ^= sb[k[31]];
-  k[3] ^= sb[k[28]];
-  *rc = F( *rc);
-
-  for(i = 4; i < 16; i += 4){
-    k[i] ^= k[i-4];
-    k[i+1] ^= k[i-3];
-    k[i+2] ^= k[i-2];
-    k[i+3] ^= k[i-1];
-  }
-
-  k[16] ^= sb[k[12]];
-  k[17] ^= sb[k[13]];
-  k[18] ^= sb[k[14]];
-  k[19] ^= sb[k[15]];
-
-  for(i = 20; i < 32; i += 4){
-    k[i] ^= k[i-4];
-    k[i+1] ^= k[i-3];
-    k[i+2] ^= k[i-2];
-    k[i+3] ^= k[i-1];
-  }
-  }
-
-  else if(round_size == 10)
-  {	  
-  k[0] ^= sb[k[29]] ^ (*rc);
-  k[1] ^= sb[k[30]];
-  k[2] ^= sb[k[31]];
-  k[3] ^= sb[k[28]];
-  *rc = F( *rc);
-
-  for(i = 4; i < 16; i += 4){
-    k[i] ^= k[i-4];
-    k[i+1] ^= k[i-3];
-    k[i+2] ^= k[i-2];
-    k[i+3] ^= k[i-1];
-  }
-
-  k[16] ^= sb[k[12]];
-  k[17] ^= sb[k[13]];
-  k[18] ^= sb[k[14]];
-  k[19] ^= sb[k[15]];
-
-  for(i = 20; i < 32; i += 4)
-  {
-    k[i] ^= k[i-4];
-    k[i+1] ^= k[i-3];
-    k[i+2] ^= k[i-2];
-    k[i+3] ^= k[i-1];
-  }
-
-
-  else
-  {	  
   k[0] ^= sb[k[29]] ^ (*rc);
   k[1] ^= sb[k[30]];
   k[2] ^= sb[k[31]];
@@ -342,8 +255,7 @@ void aes_expandEncKey(uint8_t *k, uint8_t *rc, const uint8_t *sbi,uint8_t round_
 
 
 // inv add expand key operation
-void aes_expandDecKey(uint8_t *k, uint8_t *rc,uint8_t round_size)
-{
+void aes_expandDecKey(uint8_t *k, uint8_t *rc){
   uint8_t i;
 
   for(i = 28; i > 16; i -= 4){
@@ -389,7 +301,6 @@ void aes256_init(uint8_t *k){
 
 
 // aes encrypt algorithm
-/* What does the offset do? */
 void aes256_encrypt_ecb(uint8_t *buf, unsigned long offset){
   uint8_t i, rcon;
   uint8_t buf_t[AES_BLOCK_SIZE];
@@ -400,8 +311,7 @@ void aes256_encrypt_ecb(uint8_t *buf, unsigned long offset){
     aes_subBytes(buf_t);
     aes_shiftRows(buf_t);
     aes_mixColumns(buf_t);
-  
-    // What is the point of this line?
+
     if( i & 1 ){
       aes_addRoundKey( buf_t, &ctx_key[16]);
     }
@@ -516,7 +426,6 @@ int main(int argc, char* argv[]){
   for (i = 0; i < sizeof(key);i++) key[i] = i;
 
 
-/*Write stats to an output file*/
   // start encrypt in CPU
   start = clock();
   encryptdemo(key, buf, numbytes);
@@ -530,7 +439,7 @@ int main(int argc, char* argv[]){
   fwrite(buf, 1, numbytes, file);
   fclose(file);
 
-/*Write stats to an output file*/
+
   // start decrypt in CPU
   start = clock();
   decryptdemo(key, buf, numbytes);

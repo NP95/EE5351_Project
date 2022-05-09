@@ -1,0 +1,101 @@
+Size is 1024
+Padding file with 0 bytes for a new size of 1024
+
+Beginning encryption
+time used:0.000082
+CPU encryption throughput: 12487804.878049 bytes/second
+
+Beginning decryption
+time used:0.000077
+CPU decryption throughput: 13298701.298701 bytes/second
+Size is 134217728
+Padding file with 0 bytes for a new size of 134217728
+
+Beginning encryption
+time used:5.158106
+CPU encryption throughput: 26020738.619951 bytes/second
+
+Beginning decryption
+time used:7.917871
+CPU decryption throughput: 16951239.544064 bytes/second
+Size is 268435456
+Padding file with 0 bytes for a new size of 268435456
+
+Beginning encryption
+time used:10.313230
+CPU encryption throughput: 26028262.338763 bytes/second
+
+Beginning decryption
+time used:15.641501
+CPU decryption throughput: 17161745.282630 bytes/second
+Size is 536870912
+Padding file with 0 bytes for a new size of 536870912
+
+Beginning encryption
+time used:20.625532
+CPU encryption throughput: 26029433.422614 bytes/second
+
+Beginning decryption
+time used:31.529884
+CPU decryption throughput: 17027367.179657 bytes/second
+Size is 1073741824
+Padding file with 0 bytes for a new size of 1073741824
+
+Beginning encryption
+time used:40.917964
+CPU encryption throughput: 26241330.678134 bytes/second
+
+Beginning decryption
+time used:62.489771
+CPU decryption throughput: 17182681.370364 bytes/second
+Size is 2147483648
+Padding file with 0 bytes for a new size of 2147483648
+
+Beginning encryption
+time used:79.507928
+CPU encryption throughput: 27009679.437251 bytes/second
+
+Beginning decryption
+time used:122.767072
+CPU decryption throughput: 17492342.311463 bytes/second
+Size is 3221225472
+Padding file with 0 bytes for a new size of 3221225472
+
+Beginning encryption
+time used:122.692106
+CPU encryption throughput: 26254545.439134 bytes/second
+
+Beginning decryption
+time used:187.347427
+CPU decryption throughput: 17193860.217787 bytes/second
+Size is 4294967296
+Padding file with 0 bytes for a new size of 4294967296
+
+Beginning encryption
+time used:163.561745
+CPU encryption throughput: 26258996.539808 bytes/second
+
+Beginning decryption
+time used:249.322207
+CPU decryption throughput: 17226573.387424 bytes/second
+Size is 5368709120
+Padding file with 0 bytes for a new size of 5368709120
+
+Beginning encryption
+time used:206.131407
+CPU encryption throughput: 26045080.650907 bytes/second
+
+Beginning decryption
+time used:311.870408
+CPU decryption throughput: 17214551.243990 bytes/second
+Size is 6442450944
+Padding file with 0 bytes for a new size of 6442450944
+
+Beginning encryption
+time used:244.649645
+CPU encryption throughput: 26333375.403018 bytes/second
+
+Beginning decryption
+time used:373.926366
+CPU decryption throughput: 17229196.787904 bytes/second
+
