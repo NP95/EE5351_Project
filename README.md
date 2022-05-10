@@ -2,7 +2,7 @@
 
 Note: I used a different system than the GPU Lab machines so the results may be different from those in the log files.
 
-For running the project copy the contents of the scripts directory and the gpu\_original.cu and cpu.c to a new directory
+For running the project copy the contents of the scripts directory and the gpu_original.cu and cpu.c to a new directory
 
 1. First use test\_file\_gen.sh to generate the files.
 You may want to comment out everything after line 5, since it takes about 10 minutes to generate files from 2 GB to 6 GB
